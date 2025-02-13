@@ -1,0 +1,19 @@
+<div class="add-product-container">
+    <h2>Add Product Page</h2>
+    <button (click)="logout()">Logout</button>
+    <button (click)="openModal()">Add Product</button>
+    <button (click)="toggleView()">Switch to {{ isTableView ? 'Card' : 'Table' }} View</button>
+
+    <table *ngIf="isTableView">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>

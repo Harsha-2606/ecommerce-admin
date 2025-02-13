@@ -1,0 +1,51 @@
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+.login-page {
+    background-image: url("/assets/adminlogin-bg.avif");
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    width: 100vw;
+    display: flex;
+
+    .login-container {
+        display: flex;
+        flex-direction: column;
+        padding: 2rem;
+        width: 35vw;
+        margin: auto;
+        margin-top: 50vh;
+        background-color: #272323;
+        border-radius: 1.5rem;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-container h1 {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: #ffffff;
+    }
+
+    .user-icon {
+        font-size: 1.5rem;
+    }
+
+    .login-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .login-button {
+        background-color: white;
+        color: #000;
+        font-size: larger;
+    }
+}
