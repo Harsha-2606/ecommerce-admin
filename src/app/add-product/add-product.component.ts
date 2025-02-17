@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { Product } from '../models/product.model';
 import { CommonModule } from '@angular/common';
 import { ProductFormComponent } from '../product-form/product-form.component';
@@ -10,7 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-add-product',
-  imports: [CommonModule, ProductFormComponent, MatButtonModule, MatCardModule, MatTableModule],
+  imports: [CommonModule, ProductFormComponent, MatButtonModule, MatCardModule, MatTableModule, RouterModule],
   templateUrl: './add-product.component.html',
   styleUrl: './add-product.component.scss'
 })
@@ -18,10 +18,10 @@ export class AddProductComponent implements OnInit {
   products: Product[] = [];
   isTableView: boolean = true;
   showModal: boolean = false;
-  editingProduct: Product | null =null;
+  editingProduct: Product | null = null;
   displayedColumns: string[] = ['name', 'description', 'type', 'price', 'stock', 'actions'];
 
-  constructor(private router: Router, private dialog: MatDialog, private cdRef: ChangeDetectorRef) {}
+  constructor(private router: Router, private dialog: MatDialog, private cdRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.loadProducts();
@@ -45,7 +45,7 @@ export class AddProductComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (product) {
-         this.products = this.products.map(p => (p.id === product.id ? result : p));
+          this.products = this.products.map(p => (p.id === product.id ? result : p));
         } else {
           result.id = new Date().getTime();
           this.products = [...this.products, result];
@@ -75,6 +75,10 @@ export class AddProductComponent implements OnInit {
     }
 
     this.saveProducts();
+  }
+
+  viewProduct(productId: number) {
+    this.router.navigate(['/view-product', productId])
   }
 
   toggleView() {

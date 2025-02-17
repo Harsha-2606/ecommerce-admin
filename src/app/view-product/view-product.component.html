@@ -1,1 +1,10 @@
-<h1>View Product Page</h1>
+<h2>Product Details</h2>
+<div *ngIf="product">
+    <p><strong>Name:</strong> {{ product?.name }}</p>
+    <p><strong>Description:</strong> {{ product?.description }}</p>
+    <p><strong>Type:</strong> {{ product?.type }}</p>
+    <p><strong>Proce:</strong> {{ product?.price | currency }}</p>
+    <p><strong>Stock:</strong> {{ product?.stock }}</p>
+
+    <button mat-raised-button coor="primary" (click)="goBack()">Back</button>
+</div>
