@@ -7,10 +7,11 @@ import { MatDialog } from '@angular/material/dialog'
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table'
 import { MatCardModule } from '@angular/material/card';
+import { ProductListComponent } from '../product-list/product-list.component';
 
 @Component({
   selector: 'app-add-product',
-  imports: [CommonModule, ProductFormComponent, MatButtonModule, MatCardModule, MatTableModule, RouterModule],
+  imports: [CommonModule, ProductFormComponent, MatButtonModule, MatCardModule, MatTableModule, RouterModule, ProductListComponent],
   templateUrl: './add-product.component.html',
   styleUrl: './add-product.component.scss'
 })
