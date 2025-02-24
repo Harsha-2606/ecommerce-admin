@@ -8,10 +8,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table'
 import { MatCardModule } from '@angular/material/card';
 import { ProductListComponent } from '../product-list/product-list.component';
+import { Store } from '@ngrx/store';
+import { loadProducts, loadProductsSuccess, addProduct, editProduct, deleteProduct } from '../store/product.actions';
+import { selectAllProducts } from '../store/product.selectors';
+import { ProductStoreModule } from '../store/product-store.module';
 
 @Component({
   selector: 'app-add-product',
-  imports: [CommonModule, ProductFormComponent, MatButtonModule, MatCardModule, MatTableModule, RouterModule, ProductListComponent],
+  standalone: true,
+  imports: [CommonModule, ProductFormComponent, MatButtonModule, MatCardModule, MatTableModule, RouterModule, ProductListComponent, ProductStoreModule],
   templateUrl: './add-product.component.html',
   styleUrl: './add-product.component.scss'
 })
@@ -22,19 +27,20 @@ export class AddProductComponent implements OnInit {
   editingProduct: Product | null = null;
   displayedColumns: string[] = ['name', 'description', 'type', 'price', 'stock', 'actions'];
 
-  constructor(private router: Router, private dialog: MatDialog, private cdRef: ChangeDetectorRef) { }
+  constructor(private router: Router, private dialog: MatDialog, private cdRef: ChangeDetectorRef, private store: Store) { }
 
   ngOnInit(): void {
     this.loadProducts();
+    this.store.select(selectAllProducts).subscribe(products => {
+      this.products = products;
+      this.cdRef.detectChanges();
+    });
   }
 
   loadProducts() {
     const storedProducts = localStorage.getItem('products');
-    this.products = storedProducts ? JSON.parse(storedProducts) : [];
-  }
-
-  saveProducts() {
-    localStorage.setItem('products', JSON.stringify(this.products));
+    const products = storedProducts ? JSON.parse(storedProducts) : [];
+    this.store.dispatch(loadProductsSuccess({ products }));
   }
 
   openModal(product: Product | null = null) {
@@ -46,13 +52,11 @@ export class AddProductComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (product) {
-          this.products = this.products.map(p => (p.id === product.id ? result : p));
+          this.store.dispatch(editProduct({ product: result }));
         } else {
           result.id = new Date().getTime();
-          this.products = [...this.products, result];
+          this.store.dispatch(addProduct({ product: result}))
         }
-        this.saveProducts();
-        this.cdRef.detectChanges();
       }
     });
   }
@@ -62,20 +66,7 @@ export class AddProductComponent implements OnInit {
   }
 
   deleteProduct(id: number) {
-    this.products = this.products.filter(product => product.id !== id);
-    this.saveProducts();
-    this.cdRef.detectChanges();
-  }
-
-  handleProductSave(product: Product) {
-    if (!product.id) {
-      product.id = new Date().getTime();
-      this.products.push(product);
-    } else {
-      this.products = this.products.map(p => (p.id === product.id ? product : p));
-    }
-
-    this.saveProducts();
+    this.store.dispatch(deleteProduct({ id }));
   }
 
   viewProduct(productId: number) {
