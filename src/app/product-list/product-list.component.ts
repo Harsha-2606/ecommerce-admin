@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { Product } from '../models/product.model';
 import { MatDialog } from '@angular/material/dialog';
@@ -7,19 +7,36 @@ import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { ProductFormComponent } from '../product-form/product-form.component';
 import { CommonModule } from '@angular/common';
+import { Store, select } from '@ngrx/store';
+import { loadProducts, deleteProduct } from '../store/product.actions';
+import { selectAllProducts } from '../store/product.selectors';
+import { ProductState } from '../store/product.reducer';
+import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-product-list',
-  imports: [MatButtonModule, MatTableModule, MatCardModule, RouterModule, ProductFormComponent, CommonModule],
+  standalone: true,
+  imports: [MatButtonModule, MatTableModule, MatCardModule, RouterModule, CommonModule],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
 })
-export class ProductListComponent {
-  @Input() products: Product[] = [];
+export class ProductListComponent implements OnInit {
   @Input() isTableView: boolean = false;
   @Input() displayedColumns: string[] = [];
 
-  constructor(private router: Router, private dialog: MatDialog) {}
+  private store = inject<Store<{ products: ProductState }>>(Store);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
+
+  products$: Observable<Product[]> =  this.store.pipe(select(selectAllProducts));
+
+  ngOnInit() {
+    this.products$.subscribe(products => {
+      console.log('Products Updated:', products);
+    });
+    this.store.dispatch(loadProducts());
+  }
 
   editProduct(product: Product) {
     const dialogRef = this.dialog.open(ProductFormComponent, {
@@ -29,22 +46,16 @@ export class ProductListComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.products = this.products.map(p => (p.id === product.id ? result : p));
-        this.saveProducts();
+        console.log('Editing Product:', result);
       }
     });
   }
 
   deleteProduct(id: number) {
-    this.products = this.products.filter(product => product.id !== id);
-    this.saveProducts();
+    this.store.dispatch(deleteProduct({ id }));
   }
 
   viewProduct(productId: number) {
     this.router.navigate(['/view-product', productId]);
-  }
-
-  saveProducts() {
-    localStorage.setItem('products', JSON.stringify(this.products));
   }
 }

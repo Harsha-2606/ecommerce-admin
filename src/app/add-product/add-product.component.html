@@ -5,6 +5,6 @@
     <button mat-raised-button (click)="toggleView()">Switch to {{ isTableView ? 'Card' : 'Table' }} View</button>
 </div>
 
-<app-product-list [products]="products" [isTableView]="isTableView" [displayedColumns]="displayedColumns"></app-product-list>
+<app-product-list [isTableView]="isTableView" [displayedColumns]="displayedColumns"></app-product-list>
 
 <app-product-form *ngIf="showModal"></app-product-form>

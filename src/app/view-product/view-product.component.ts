@@ -1,35 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Product } from '../models/product.model';
 import { CommonModule } from '@angular/common';
-import { Store } from '@ngrx/store';
-import { selectProductById } from '../store/product.selectors';
-import { ProductStoreModule } from '../store/product-store.module';
+import { Store, select } from '@ngrx/store';
+import { selectAllProducts, selectProductById } from '../store/product.selectors';
+import { ProductState } from '../store/product.reducer';
+import { loadProducts } from '../store/product.actions';
 
 @Component({
   selector: 'app-view-product',
   standalone: true,
-  imports: [CommonModule, ProductStoreModule],
+  imports: [CommonModule],
   templateUrl: './view-product.component.html',
   styleUrl: './view-product.component.scss'
 })
-export class ViewProductComponent {
+export class ViewProductComponent implements OnInit {
   product!: Product | undefined;
 
-  constructor(private route: ActivatedRoute, private router: Router, private store: Store) {}
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private store = inject<Store<{ products: ProductState }>>(Store);
 
   ngOnInit() {
-    this.loadProduct();
-  }
-
-  loadProduct() {
     const productId = this.route.snapshot.paramMap.get('id');
-    console.log('Product ID:', productId)
+
     if (productId) {
-      this.store.select(selectProductById(+productId)).subscribe(product => {
+      this.store.pipe(select(selectProductById(+productId))).subscribe(product => {
         this.product = product;
-        console.log('Product:', product)
       });
+
+      this.store.pipe(select(selectAllProducts)).subscribe(products => {
+        if(!products.length) {
+          this.store.dispatch(loadProducts());
+        }
+      })
     }
   }
 

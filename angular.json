@@ -44,10 +44,11 @@
           },
           "configurations": {
             "production": {
+              "aot": true,
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
+                  "maximumWarning": "1mb",
                   "maximumError": "1MB"
                 },
                 {

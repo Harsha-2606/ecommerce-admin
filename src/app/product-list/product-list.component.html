@@ -1,4 +1,4 @@
-<table mat-table [dataSource]="products" *ngIf="isTableView" class="mat-elevation-z8">
+<table mat-table [dataSource]="(products$ | async) ?? []" *ngIf="isTableView" class="mat-elevation-z8">
     <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> Name </th>
         <td mat-cell *matCellDef="let product">
@@ -44,15 +44,17 @@
 </table>
 
 <div *ngIf="!isTableView" class="card-container">
-    <mat-card *ngFor="let product of products" class="product-card" (click)="viewProduct(product.id)">
-        <mat-card-title>{{ product.name }}</mat-card-title>
-        <mat-card-content>
-            <p>{{ product.description }}</p>
-            <p>Type: {{ product.type }}</p>
-            <p>Price: {{ product.price | currency }}</p>
-            <p>Stock: {{ product.stock }}</p>
-        </mat-card-content>
-        <button mat-button color="primary" (click)="editProduct(product)">Edit</button>
-        <button mat-button color="warn" (click)="deleteProduct(product.id)">Delete</button>
-    </mat-card>
+    <ng-container *ngIf="products$ | async as products">
+        <mat-card *ngFor="let product of products" class="product-card" (click)="viewProduct(product.id)">
+            <mat-card-title>{{ product.name }}</mat-card-title>
+            <mat-card-content>
+                <p>{{ product.description }}</p>
+                <p>Type: {{ product.type }}</p>
+                <p>Price: {{ product.price | currency }}</p>
+                <p>Stock: {{ product.stock }}</p>
+            </mat-card-content>
+            <button mat-button color="primary" (click)="editProduct(product)">Edit</button>
+            <button mat-button color="warn" (click)="deleteProduct(product.id)">Delete</button>
+        </mat-card>
+    </ng-container>
 </div>

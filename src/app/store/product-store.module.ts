@@ -1,23 +1,26 @@
 import { NgModule } from "@angular/core";
-import { StoreModule } from "@ngrx/store";
+import { StoreModule, MetaReducer } from "@ngrx/store";
+import { EffectsModule } from "@ngrx/effects";
+import { localStorageSync } from 'ngrx-store-localstorage';
 import { productReducer, ProductState } from "./product.reducer";
-import { environment } from "../../environments/environment";
-import { ActionReducerMap, MetaReducer } from "@ngrx/store";
+import { ProductEffects } from "./product.effects";
 
-export interface State {
-    products: ProductState;
+export function localStorageSyncReducer(reducer: any) {
+    return (state: any, action: any) => {
+        const newState = localStorageSync({
+            keys: ['products'],
+            rehydrate: true
+        })(reducer)(state, action);
+        return newState || state;
+    };
 }
 
-export const reducers: ActionReducerMap<State> = {
-    products: productReducer,
-};
-
-export const metaReducers: MetaReducer<State>[] = !environment.production ? [] : [];
-
+const metaReducers: MetaReducer<any>[] = [localStorageSyncReducer];
 @NgModule({
     imports: [
-        StoreModule.forFeature('products', productReducer),
-        StoreModule.forRoot(reducers, { metaReducers })
-    ]
+        StoreModule.forFeature('products', productReducer, { metaReducers }),
+        EffectsModule.forFeature([ProductEffects])
+    ],
+    exports: [StoreModule, EffectsModule]
 })
-export class ProductStoreModule {}
+export class ProductStoreModule { }

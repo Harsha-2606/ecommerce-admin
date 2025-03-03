@@ -10,6 +10,6 @@ export const selectAllProducts = createSelector(
 );
 
 export const selectProductById = (productId: number) => createSelector(
-    selectAllProducts,
-    (products: Product[]) => products.find(product => product.id === productId)
+    selectProductState, (state: ProductState) =>
+    state.products.find((product: Product) => product.id === productId || null)
 );

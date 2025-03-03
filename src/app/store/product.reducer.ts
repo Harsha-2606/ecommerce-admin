@@ -6,23 +6,46 @@ export interface ProductState {
     products: Product[];
 }
 
+const getSavedProducts = (): Product[] => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+        const savedProducts = localStorage.getItem('products');
+        return savedProducts ? JSON.parse(savedProducts) : [];
+    }
+    return [];
+}
+
 export const initialState: ProductState = {
-    products: []
+    products: getSavedProducts()
 };
 
 export const productReducer = createReducer(
     initialState,
     on(loadProductsSuccess, (state, { products }) => {
         console.log('Products loaded:', products);
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('products', JSON.stringify(products));
+        }
         return { ...state, products };
     }),
-    on(addProduct, (state, { product }) => ({ ...state, products: [...state.products, product] })),
-    on(editProduct, (state, { product }) => ({
-        ...state,
-        products: state.products.map(p => p.id === product.id ? product : p)
-    })),
-    on(deleteProduct, (state, { id }) => ({
-        ...state,
-        products: state.products.filter(product => product.id !== id)
-    }))
+    on(addProduct, (state, { product }) => {
+        const updatedProducts = [...state.products, product];
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('products', JSON.stringify(updatedProducts));
+        }
+        return { ...state, products: updatedProducts };
+    }),
+    on(editProduct, (state, { product }) => {
+        const updatedProducts = state.products.map(p => p.id === product.id ? product : p);
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('products', JSON.stringify(updatedProducts));
+        }
+        return { ...state, products: updatedProducts };
+    }),
+    on(deleteProduct, (state, { id }) => {
+        const updatedProducts = state.products.filter(product => product.id !== id);
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('products', JSON.stringify(updatedProducts));
+        }
+        return { ...state, products: updatedProducts };
+    })
 );
